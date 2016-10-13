@@ -55,9 +55,23 @@ get '/actors/:actor_id' do
 end
 
 get '/movies' do
-
+  @movies_array = db_connection { |conn| conn.exec("
+    SELECT movies.id AS id,
+      title,
+      year,
+      rating,
+      genres.name AS genre,
+      studios.name AS studio
+    FROM movies
+    LEFT OUTER JOIN genres
+    ON (movies.genre_id = genres.id)
+    LEFT OUTER JOIN studios
+    ON (movies.studio_id = studios.id)
+    ORDER BY title
+  ;") }.to_a
+  erb :movies
 end
 
 get '/movies/:movie_id' do
-  
+
 end

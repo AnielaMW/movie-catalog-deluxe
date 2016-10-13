@@ -1,10 +1,10 @@
 <h2>Movie Info</h2>
-<h3><%= @movie_info.first["title"] %></h3>
+<h3><%= @full_info.first["title"] %></h3>
 <ul>
-  <li>Year: <%= @movie_info.first["year"] %></li>
-  <li>Rating: <%= @movie_info.first["rating"] %></li>
-  <li>Genre: <%= @movie_info.first["genre"] %></li>
-  <li>Studio: <%= @movie_info.first["studio"] %></li>
+  <li>Year: <%= @full_info.first["year"] %></li>
+  <li>Rating: <%= @full_info.first["rating"] %></li>
+  <li>Genre: <%= @full_info.first["genre"] %></li>
+  <li>Studio: <%= @full_info.first["studio"] %></li>
 </ul>
 
 <p>synopsis</p>
@@ -15,7 +15,7 @@
     <th>Actor</th>
   </tr>
 
-  <% @movie_info.map do |item| %>
+  <% @full_info.map do |item| %>
     <tr>
       <td><%= item["role"] %></td>
       <td><a href="/actors/<%= item["actor_id"] %>"><%= item["actor"] %></td>

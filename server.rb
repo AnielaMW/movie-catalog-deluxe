@@ -22,21 +22,41 @@ def db_connection
 end
 
 get '/' do
-  redirect '/actors'
+  erb :home
 end
 
 get '/actors' do
-  @actors_array = db_connection { |conn| conn.exec("
-    SELECT * FROM actors
-    ORDER BY name
-  ;") }.to_a
-
+  @actors_array = actors_list.to_a
   erb :actors
 end
 
 get '/actors/:actor_id' do
   @actor_id = params[:actor_id]
-  @full_bio = entry = db_connection { |conn| conn.exec("
+  @full_bio = actor_bio.to_a
+  erb :actor_bio
+end
+
+get '/movies' do
+  @movies_array = movies_list.to_a
+  erb :movies
+end
+
+get '/movies/:movie_id' do
+  @movie_id = params[:movie_id]
+  @full_info = movie_info.to_a
+
+  erb :movie_info
+end
+
+def actors_list
+  db_connection { |conn| conn.exec("
+    SELECT * FROM actors
+    ORDER BY name
+  ;") }
+end
+
+def actor_bio
+  db_connection { |conn| conn.exec("
     SELECT actors.name AS actor,
       actors.id AS actor_id,
       movies.title AS movie,
@@ -49,13 +69,11 @@ get '/actors/:actor_id' do
     ON (cast_members.movie_id = movies.id)
     WHERE actors.id = #{@actor_id}
     ORDER BY movies.title
-  ;") }.to_a
-
-  erb :actor_bio
+  ;") }
 end
 
-get '/movies' do
-  @movies_array = db_connection { |conn| conn.exec("
+def movies_list
+  db_connection { |conn| conn.exec("
     SELECT movies.id AS id,
       title,
       year,
@@ -68,14 +86,11 @@ get '/movies' do
     LEFT OUTER JOIN studios
     ON (movies.studio_id = studios.id)
     ORDER BY title
-  ;") }.to_a
-
-  erb :movies
+  ;") }
 end
 
-get '/movies/:movie_id' do
-  @movie_id = params[:movie_id]
-  @movie_info = db_connection { |conn| conn.exec("
+def movie_info
+  db_connection { |conn| conn.exec("
     SELECT movies.id AS id,
       title,
       year,
@@ -96,7 +111,5 @@ get '/movies/:movie_id' do
     ON (cast_members.actor_id = actors.id)
     WHERE movies.id = #{@movie_id}
     ORDER BY title, cast_members.character
-  ;") }.to_a
-
-  erb :movie_info
+  ;") }
 end

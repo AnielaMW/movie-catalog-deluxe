@@ -1,5 +1,6 @@
 require "sinatra"
 require "pg"
+require "pry"
 
 set :bind, '0.0.0.0'  # bind to all interfaces
 
@@ -18,4 +19,14 @@ def db_connection
   ensure
     connection.close
   end
+end
+
+get '/actors' do
+  @actors_array = db_connection { |conn| conn.exec("
+    SELECT * FROM actors
+    ORDER BY name;
+  ") }.to_a
+
+  erb :actors
+  # binding.pry
 end

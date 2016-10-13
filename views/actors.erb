@@ -1,0 +1,5 @@
+<ul>
+  <% @actors_array.map do |actor| %>
+  <li><a href="/actors/<%= actor["id"] %>"><%= actor["name"] %></li>
+  <% end %>
+</ul>

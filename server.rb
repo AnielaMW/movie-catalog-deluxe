@@ -69,9 +69,34 @@ get '/movies' do
     ON (movies.studio_id = studios.id)
     ORDER BY title
   ;") }.to_a
+
   erb :movies
 end
 
 get '/movies/:movie_id' do
+  @movie_id = params[:movie_id]
+  @movie_info = db_connection { |conn| conn.exec("
+    SELECT movies.id AS id,
+      title,
+      year,
+      rating,
+      genres.name AS genre,
+      studios.name AS studio,
+      cast_members.character AS role,
+      actors.name AS actor,
+      actors.id AS actor_id
+    FROM movies
+    LEFT OUTER JOIN genres
+    ON (movies.genre_id = genres.id)
+    LEFT OUTER JOIN studios
+    ON (movies.studio_id = studios.id)
+    LEFT OUTER JOIN cast_members
+    ON (movies.id = cast_members.movie_id)
+    JOIN actors
+    ON (cast_members.actor_id = actors.id)
+    WHERE movies.id = #{@movie_id}
+    ORDER BY title, cast_members.character
+  ;") }.to_a
 
+  erb :movie_info
 end

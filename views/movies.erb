@@ -1,4 +1,7 @@
 <h2>Movies List</h2>
+
+Sort by <a href="/movies_year">year</a> or <a href="/movies_rating">rating</a>.
+
 <table>
   <tr>
     <th>Rating</th>
@@ -7,7 +10,7 @@
     <th>Genre</th>
     <th>Studio</th>
   </tr>
-  
+
   <% @movies_array.map do |movie| %>
     <tr>
       <td><%= movie["rating"] %></td>

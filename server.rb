@@ -30,22 +30,32 @@ get '/actors' do
   erb :actors
 end
 
-get '/actors/:actor_id' do
-  @actor_id = params[:actor_id]
+get '/actors/:id' do
+  @actor_id = params[:id]
   @full_bio = actor_bio.to_a
   erb :actor_bio
 end
 
 get '/movies' do
-  @movies_array = movies_list.to_a
+  @movies_array = movies_list("title").to_a
   erb :movies
 end
 
-get '/movies/:movie_id' do
-  @movie_id = params[:movie_id]
+get '/movies/:id' do
+  @movie_id = params[:id]
   @full_info = movie_info.to_a
 
   erb :movie_info
+end
+
+get '/movies_year' do
+  @movies_array = movies_list("year").to_a
+  erb :movies
+end
+
+get '/movies_rating' do
+  @movies_array = movies_list("rating").to_a
+  erb :movies
 end
 
 def actors_list
@@ -72,7 +82,7 @@ def actor_bio
   ;") }
 end
 
-def movies_list
+def movies_list(order_by)
   db_connection { |conn| conn.exec("
     SELECT movies.id AS id,
       title,
@@ -85,7 +95,7 @@ def movies_list
     ON (movies.genre_id = genres.id)
     LEFT OUTER JOIN studios
     ON (movies.studio_id = studios.id)
-    ORDER BY title
+    ORDER BY #{order_by}
   ;") }
 end
 

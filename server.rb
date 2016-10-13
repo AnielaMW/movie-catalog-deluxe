@@ -21,12 +21,43 @@ def db_connection
   end
 end
 
+get '/' do
+  redirect '/actors'
+end
+
 get '/actors' do
   @actors_array = db_connection { |conn| conn.exec("
     SELECT * FROM actors
-    ORDER BY name;
-  ") }.to_a
+    ORDER BY name
+  ;") }.to_a
 
   erb :actors
-  # binding.pry
+end
+
+get '/actors/:actor_id' do
+  @actor_id = params[:actor_id]
+  @full_bio = entry = db_connection { |conn| conn.exec("
+    SELECT actors.name AS actor,
+      actors.id AS actor_id,
+      movies.title AS movie,
+      movies.id AS movie_id,
+      cast_members.character AS role
+    FROM actors
+    JOIN cast_members
+    ON (actors.id = cast_members.actor_id)
+    JOIN movies
+    ON (cast_members.movie_id = movies.id)
+    WHERE actors.id = #{@actor_id}
+    ORDER BY movies.title
+  ;") }.to_a
+
+  erb :actor_bio
+end
+
+get '/movies' do
+
+end
+
+get '/movies/:movie_id' do
+  
 end

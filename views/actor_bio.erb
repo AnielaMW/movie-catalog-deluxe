@@ -1,0 +1,9 @@
+<h2>Actor Bio</h2>
+<h3><%= @full_bio[0]["actor"] %></h3>
+<ul>
+  <% @full_bio.map do |item| %>
+  <li>
+    <a href="/movies/<%= item["movie_id"] %>"><%= item["movie"] %></a> as <%= item["role"] %>
+  </li>
+  <% end %>
+</ul>

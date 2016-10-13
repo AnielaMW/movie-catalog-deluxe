@@ -1,0 +1,19 @@
+<h2>Movies List</h2>
+<table>
+  <tr>
+    <th>Rating</th>
+    <th>Movie</th>
+    <th>Year</th>
+    <th>Genre</th>
+    <th>Studio</th>
+  </tr>
+  <% @movies_array.map do |movie| %>
+    <tr>
+      <td><%= movie["rating"] %></td>
+      <td><a href="/movies/<%= movie["id"] %>"><%= movie["title"] %></td>
+      <td><%= movie["year"] %></td>
+      <td><%= movie["genre"] %></td>
+      <td><%= movie["studio"] %></td>
+    </tr>
+  <% end %>
+</table>

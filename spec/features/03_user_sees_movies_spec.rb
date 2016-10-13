@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'pry'
 
 feature 'user sees movies' do
   before(:each) do
@@ -41,4 +42,3 @@ feature 'user sees movies' do
     expect(first_movie_position).to be < last_movie_position
   end
 end
-

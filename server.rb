@@ -26,10 +26,11 @@ get '/' do
 end
 
 get '/actors' do
+  rows = 50 * params["page"].to_i
   if params["query"]
-    @actors_array = actor_query(params["query"]).to_a
+    @actors_array = actor_query(params["query"], rows).to_a
   else
-    @actors_array = actors_list.to_a
+    @actors_array = actors_list(rows).to_a
   end
   erb :actors
 end
@@ -43,7 +44,7 @@ end
 
 get '/movies' do
   order = order_by(params["order"])
-  rows = 20 * params["page"].to_i
+  rows = 50 * params["page"].to_i
   sort = params["sort"]
   if params["query"]
     query = params["query"]
@@ -59,7 +60,7 @@ end
 # post '/movies' do
 #   # binding.pry
 #   order = order_by(params["order"])
-#   rows = 20 * params["page"].to_i
+#   rows = 50 * params["page"].to_i
 #   sort = params["sort"]
 #   @movies_array = movies_list(order, sort, rows).to_a
 #   erb :movies
@@ -72,12 +73,34 @@ get '/movies/:id' do
   erb :movie_info
 end
 
-def actors_list
+def order_by(order)
+  if order == "rating"
+    "rating"
+  elsif order == "year"
+    "year"
+  else
+    "title"
+  end
+end
+
+def actors_list(rows)
   db_connection { |conn| conn.exec("
     SELECT * FROM actors
     ORDER BY name
+    OFFSET #{rows} ROWS
+    FETCH NEXT 50 ROWS ONLY
   ;") }
 end
+
+def actor_query(query, rows)
+  db_connection { |conn| conn.exec("
+    SELECT * FROM actors
+    WHERE actors.name ILIKE '%#{query}%'
+    ORDER BY name
+    OFFSET #{rows} ROWS
+    FETCH NEXT 50 ROWS ONLY
+    ;") }
+  end
 
 def actor_bio
   db_connection { |conn| conn.exec("
@@ -96,6 +119,18 @@ def actor_bio
   ;") }
 end
 
+  def movies_count(actor_id)
+    db_connection { |conn| conn.exec("
+      SELECT COUNT(*) FROM movies
+      JOIN cast_members
+      ON (movies.id = cast_members.movie_id)
+      JOIN actors
+      ON (actors.id = cast_members.actor_id)
+      WHERE actors.id = '#{actor_id}'
+      GROUP BY actors.id
+      ;") }
+    end
+
 def movies_list(order_by, sort, rows)
   db_connection { |conn| conn.exec("
     SELECT movies.id AS id,
@@ -111,7 +146,7 @@ def movies_list(order_by, sort, rows)
     ON (movies.studio_id = studios.id)
     ORDER BY #{order_by} #{sort} NULLS LAST
     OFFSET #{rows} ROWS
-    FETCH NEXT 20 ROWS ONLY
+    FETCH NEXT 50 ROWS ONLY
   ;") }
 end
 
@@ -140,16 +175,6 @@ def movie_info
   ;") }
 end
 
-def order_by(order)
-  if order == "rating"
-    "rating"
-  elsif order == "year"
-    "year"
-  else
-    "title"
-  end
-end
-
 def movies_query(order_by, sort, rows, query)
   db_connection { |conn| conn.exec("
     SELECT movies.id AS id,
@@ -166,26 +191,6 @@ def movies_query(order_by, sort, rows, query)
     WHERE title ILIKE '%#{query}%'
     ORDER BY #{order_by} #{sort} NULLS LAST
     OFFSET #{rows} ROWS
-    FETCH NEXT 20 ROWS ONLY
-  ;") }
-end
-
-def actor_query(query)
-  db_connection { |conn| conn.exec("
-    SELECT * FROM actors
-    WHERE actors.name ILIKE '%#{query}%'
-    ORDER BY name
-  ;") }
-end
-
-def movies_count(actor_id)
-  db_connection { |conn| conn.exec("
-    SELECT COUNT(*) FROM movies
-    JOIN cast_members
-    ON (movies.id = cast_members.movie_id)
-    JOIN actors
-    ON (actors.id = cast_members.actor_id)
-    WHERE actors.id = '#{actor_id}'
-    GROUP BY actors.id
+    FETCH NEXT 50 ROWS ONLY
   ;") }
 end

@@ -1,9 +1,16 @@
 <h2>Actor Bio</h2>
 <h3><%= @full_bio[0]["actor"] %></h3>
-<ul>
-  <% @full_bio.map do |item| %>
-  <li>
-    <a href="/movies/<%= item["movie_id"] %>"><%= item["movie"] %></a> as <%= item["role"] %>
-  </li>
+
+<table>
+  <tr>
+    <th>Movie (<%= @movies_count[0]["count"].to_i %>)</th>
+    <th>Role</th>
+  </tr>
+
+  <% @full_bio.map do |movie| %>
+    <tr>
+      <td><a href="/movies/<%= movie["movie_id"] %>"><%= movie["movie"] %></td>
+      <td><%= movie["role"] %></td>
+    </tr>
   <% end %>
-</ul>
+</table>

@@ -1,6 +1,6 @@
 <h2>Actors A-List</h2>
 <ul>
   <% @actors_array.map do |actor| %>
-  <li><a href="/actors/<%= actor["id"] %>"><%= actor["name"] %></li>
+  <li><a href="/actors/<%= actor["id"] %>"><%= actor["name"] %></a></li>
   <% end %>
 </ul>
